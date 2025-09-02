@@ -2,6 +2,7 @@ package steam
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -22,7 +23,7 @@ func PriceHandler(client *Client) http.HandlerFunc {
 		}
 		price, err := client.FetchPrice(req.Item, 1)
 		if err != nil {
-			http.Error(w, "Failed to fetch price", http.StatusInternalServerError)
+			http.Error(w, loger, http.StatusInternalServerError)
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")

@@ -1,0 +1,11 @@
+root = "."
+tmp_dir = ".tmp"
+
+[build]
+  cmd = "go build -o .tmp/app ./cmd/bot/main.go"
+  bin = ".tmp/app"
+  include_ext = ["go"]
+  exclude_dir = [".git",".tmp","migrations","sqlc"]
+
+[log]
+  time = true

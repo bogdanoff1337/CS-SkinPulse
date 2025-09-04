@@ -7,3 +7,5 @@ require (
 	github.com/go-chi/cors v1.2.2
 	github.com/joho/godotenv v1.5.1
 )
+
+require gopkg.in/telebot.v3 v3.3.8 // indirect

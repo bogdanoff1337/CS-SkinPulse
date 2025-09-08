@@ -52,28 +52,32 @@ func (h *Handlers) Start(c tb.Context) error {
         "Examples:\n" +
         "• https://steamcommunity.com/id/<your_nick>\n" +
         "• https://steamcommunity.com/profiles/<steamID64>\n"
-    return c.Send(msg, h.MainMenu)
+    return c.Send(msg, h.mainMenu)
 }
 
 func (h *Handlers) ProfileInfo(c tb.Context) error {
     chatID := c.Chat().ID
     if prof, ok := h.store.GetSteamProfile(chatID); ok && (prof.SteamID64 != "" || prof.RawURL != "") {
         if prof.SteamID64 != "" {
-            return c.Send(fmt.Sprintf("Your profile: %s\nsteamID64: `%s`", prof.RawURL, prof.SteamID64),
-                &tb.SendOptions{ParseMode: tb.ModeMarkdown})
+            return c.Send(
+                fmt.Sprintf("Your profile: %s\nsteamID64: `%s`", prof.RawURL, prof.SteamID64),
+                &tb.SendOptions{ParseMode: tb.ModeMarkdown, ReplyMarkup: h.mainMenu},
+            )
         }
-        return c.Send("Your profile: " + prof.RawURL)
+        return c.Send("Your profile: "+prof.RawURL, h.mainMenu)
     }
-    return c.Send("I don't see your Steam link yet. Please send your profile URL as a message.\n\n"+
-        "• https://steamcommunity.com/id/your_nickname\n"+
-        "• https://steamcommunity.com/profiles/76561198000000000", h.MainMenu)
+    return c.Send(
+        "I don't see your Steam link yet. Please send your profile URL as a message.\n\n"+
+            "• https://steamcommunity.com/id/your_nickname\n"+
+            "• https://steamcommunity.com/profiles/76561198000000000",
+        h.mainMenu,
+    )
 }
 
 func (h *Handlers) InventoryInfo(c tb.Context) error {
     if !h.ensureProfile(c) {
         return nil
     }
-    // You can prefetch basic inventory info from your store/cache here
     return c.Send("Inventory section: choose an action below 👇", h.menuInv)
 }
 
@@ -82,8 +86,6 @@ func (h *Handlers) UpdateInventory(c tb.Context) error {
         return nil
     }
     // TODO: call your inventory refresh service
-    // err := h.invService.Refresh(c.Chat().ID) ...
-    // if err != nil { return c.Send("Failed to update inventory. Try again later.", h.menuInv) }
     return c.Send("Started inventory update… this may take a bit.", h.menuInv)
 }
 
@@ -97,16 +99,19 @@ func (h *Handlers) InventoryStats(c tb.Context) error {
 }
 
 func (h *Handlers) BackToMain(c tb.Context) error {
-    return c.Send("Back to the main menu.", h.MainMenu)
+    return c.Send("Back to the main menu.", h.mainMenu)
 }
 
 func (h *Handlers) OnText(c tb.Context) error {
     text := strings.TrimSpace(c.Text())
     if !steam.IsValidSteamURL(text) {
-        return c.Send("Invalid link.\n"+
-            "Try again (examples):\n"+
-            "• https://steamcommunity.com/id/your_nickname\n"+
-            "• https://steamcommunity.com/profiles/76561198000000000", h.MainMenu)
+        return c.Send(
+            "Invalid link.\n"+
+                "Try again (examples):\n"+
+                "• https://steamcommunity.com/id/your_nickname\n"+
+                "• https://steamcommunity.com/profiles/76561198000000000",
+            h.mainMenu,
+        )
     }
 
     prof := storage.SteamProfile{RawURL: text}
@@ -114,14 +119,16 @@ func (h *Handlers) OnText(c tb.Context) error {
         prof.SteamID64 = id64
     }
     if err := h.store.SaveSteamProfile(c.Chat().ID, prof); err != nil {
-        return c.Send("Failed to save profile. Please try again later.", h.MainMenu)
+        return c.Send("Failed to save profile. Please try again later.", h.mainMenu)
     }
 
     if prof.SteamID64 != "" {
-        return c.Send("✅ Profile saved. Your **steamID64**: `"+prof.SteamID64+"`",
-            &tb.SendOptions{ParseMode: tb.ModeMarkdown, ReplyMarkup: h.MainMenu})
+        return c.Send(
+            "✅ Profile saved. Your **steamID64**: `"+prof.SteamID64+"`",
+            &tb.SendOptions{ParseMode: tb.ModeMarkdown, ReplyMarkup: h.mainMenu},
+        )
     }
-    return c.Send("✅ Profile saved: "+prof.RawURL, h.MainMenu)
+    return c.Send("✅ Profile saved: "+prof.RawURL, h.mainMenu)
 }
 
 func (h *Handlers) ensureProfile(c tb.Context) bool {
@@ -129,10 +136,10 @@ func (h *Handlers) ensureProfile(c tb.Context) bool {
     if prof, ok := h.store.GetSteamProfile(chatID); ok && (prof.SteamID64 != "" || prof.RawURL != "") {
         return true
     }
-    _ = c.Send("Please send your Steam profile (URL) first.", h.MainMenu)
+    _ = c.Send("Please send your Steam profile (URL) first.", h.mainMenu)
     return false
 }
 
 func (h *Handlers) MainMenu() *tb.ReplyMarkup {
-    return h.menuMain
+    return h.mainMenu
 }

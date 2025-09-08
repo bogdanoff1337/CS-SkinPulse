@@ -1,18 +1,20 @@
 package bot
 
 import (
-    tb "gopkg.in/telebot.v3"
+	tb "gopkg.in/telebot.v3"
 
-    "CS-SkinPulse/internal/storage"
+	"CS-SkinPulse/internal/storage"
 )
 
 func RegisterRoutes(b *tb.Bot, store storage.UserStore) {
-    h := NewHandlers(store)
+	h := NewHandlers(store)
 
-    b.Handle("/start", h.Start)
-    b.Handle("/me", h.Me)
+	b.Handle("/start", h.Start)
+	b.Handle(h.btnProfile, h.ProfileInfo)
+	b.Handle(h.btnInv, h.InventoryInfo)
+	b.Handle(h.btnInvUpdate, h.UpdateInventory)
+	b.Handle(h.btnInvStats, h.InventoryStats)
+	b.Handle(h.btnBack, h.BackToMain)
 
-    b.Handle(&h.btnSendLink, h.AskLink)
-
-    b.Handle(tb.OnText, h.OnText)
+	b.Handle(tb.OnText, h.OnText)
 }

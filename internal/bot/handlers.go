@@ -48,6 +48,15 @@ func NewHandlers(store storage.UserStore) *Handlers {
 }
 
 func (h *Handlers) Start(c tb.Context) error {
+    _ = h.store.UpsertTelegramUser(storage.TelegramUser{
+        ChatID:       c.Chat().ID,
+        Username:     c.Sender().Username,
+        FirstName:    c.Sender().FirstName,
+        LastName:     c.Sender().LastName,
+        LanguageCode: c.Sender().LanguageCode,
+        Timezone:     "Europe/Kyiv",
+    })
+
     msg := "Hi! Send me your Steam profile once, then use the menu below.\n\n" +
         "Examples:\n" +
         "• https://steamcommunity.com/id/<your_nick>\n" +

@@ -5,7 +5,6 @@ import "gorm.io/gorm"
 type GormStore struct{ db *gorm.DB }
 
 func NewGormStore(db *gorm.DB) *GormStore {
-	_ = db.AutoMigrate(&TelegramUser{}, &SteamProfile{})
 	return &GormStore{db: db}
 }
 
@@ -24,7 +23,7 @@ func (s *GormStore) SaveSteamProfile(chatID int64, prof SteamProfile) error {
 
 func (s *GormStore) GetSteamProfile(chatID int64) (SteamProfile, bool) {
 	var p SteamProfile
-	if err := s.db.First(&p, "chat_id = ?", chatID).Error; err != nil {
+	if err := s.db.First(&p, "telegram_user_id = ?", chatID).Error; err != nil {
 		return SteamProfile{}, false
 	}
 	return p, true

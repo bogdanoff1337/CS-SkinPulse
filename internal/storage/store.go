@@ -2,6 +2,8 @@ package storage
 
 type UserStore interface {
 	UpsertTelegramUser(u TelegramUser) error
-	SaveSteamProfile(chatID int64, prof SteamProfile) error
-	GetSteamProfile(chatID int64) (SteamProfile, bool)
+	GetTelegramUserByChatID(chatID int64) (TelegramUser, bool, error)
+
+	SaveSteamProfile(telegramUserID uint, prof SteamProfile) error
+	GetSteamProfile(telegramUserID uint) (SteamProfile, bool)
 }

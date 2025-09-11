@@ -54,10 +54,10 @@ func (h *Handlers) SaveProfileFromMessage(c tb.Context) error {
 	if id64, ok := steam.ExtractSteamID64(text); ok {
 		prof.SteamID64 = id64
 	}
-
-	if err := h.store.SaveSteamProfile(c.Chat().ID, prof); err != nil {
-		return c.Send("Failed to save profile. Please try again later.", h.mainMenu())
-	}
+	//
+	//if err := h.store.SaveSteamProfile(c.Chat().ID, prof); err != nil {
+	//	return c.Send("Failed to save profile. Please try again later.", h.mainMenu())
+	//}
 
 	if prof.SteamID64 != "" {
 		return c.Send(

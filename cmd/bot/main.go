@@ -44,7 +44,7 @@ func main() {
 	}
 
 	ui := bot.NewUI()
-	h := bot.NewHandlers(userStore)
+	h := bot.NewHandlers(userStore, ui)
 	bot.RegisterRoutes(b, h, ui)
 
 	log.Println("telegram bot started")

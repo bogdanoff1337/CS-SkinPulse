@@ -65,8 +65,8 @@ func (h *Handlers) Start(c tb.Context) error {
 }
 
 func (h *Handlers) ProfileInfo(c tb.Context) error {
-	chatID := c.Chat().ID
-	if prof, ok := h.store.GetSteamProfile(chatID); ok && (prof.SteamID64 != "" || prof.RawURL != "") {
+	prof, ok := h.store.GetSteamProfileByChatID(c.Chat().ID)
+	if ok && (prof.SteamID64 != "" || prof.RawURL != "") {
 		if prof.SteamID64 != "" {
 			return c.Send(
 				fmt.Sprintf("Your profile: %s\nsteamID64: `%s`", prof.RawURL, prof.SteamID64),
@@ -152,8 +152,8 @@ func (h *Handlers) OnText(c tb.Context) error {
 }
 
 func (h *Handlers) ensureProfile(c tb.Context) bool {
-	telegramUserID := c.ID
-	if prof, ok := h.store.GetSteamProfile(telegramUserID); ok && (prof.SteamID64 != "" || prof.RawURL != "") {
+	prof, ok := h.store.GetSteamProfileByChatID(c.Chat().ID)
+	if ok && (prof.SteamID64 != "" || prof.RawURL != "") {
 		return true
 	}
 	_ = c.Send("Please send your Steam profile (URL) first.", h.mainMenu)

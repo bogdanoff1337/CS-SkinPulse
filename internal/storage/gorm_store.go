@@ -37,9 +37,14 @@ func (s *GormStore) SaveSteamProfile(telegramUserID uint, prof SteamProfile) err
 	return s.db.Save(&prof).Error
 }
 
-func (s *GormStore) GetSteamProfile(telegramUserID uint) (SteamProfile, bool) {
+func (s *GormStore) GetSteamProfileByChatID(chatID int64) (SteamProfile, bool) {
 	var p SteamProfile
-	if err := s.db.First(&p, "telegram_user_id = ?", telegramUserID).Error; err != nil {
+	err := s.db.
+		Table("steam_profiles").
+		Joins("JOIN telegram_users tu ON tu.id = steam_profiles.telegram_user_id").
+		Where("tu.chat_id = ?", chatID).
+		First(&p).Error
+	if err != nil {
 		return SteamProfile{}, false
 	}
 	return p, true
